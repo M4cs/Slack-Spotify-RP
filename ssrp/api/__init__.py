@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import time
 from ssrp.utils.colors import *
 
 class API:
@@ -61,14 +62,14 @@ class API:
             return (None, None, None)
             
     def set_now_playing(self):
+        song, artist, album = self.get_current_playing_song()
         for workspace in self.slack_workspace_tokens:
-            song, artist, album = self.get_current_playing_song()
             if not song or not artist or not album:
                 show_music("Not Playing Anything")
                 requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
                     "profile": {
-                    "status_text": "",
-                    "status_emoji": "",
+                    "status_text": "Spotify: Not Playing Anything",
+                    "status_emoji": ":musical_note:",
                     "status_expiration": 0
                 }}), headers={"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + workspace})
             else:
@@ -80,6 +81,7 @@ class API:
                     "status_emoji": ":musical_note:",
                     "status_expiration": 30
                 }}), headers={"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + workspace})
+            time.sleep(2)
     
             
     def test_spotify_token(self):

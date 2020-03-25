@@ -68,7 +68,9 @@ def setup_wizard():
         ans3 = input(tprompt)
         if ans3.lower() == "y":
             while True:
-                webbrowser.open_new_tab("https://slack.com/oauth/authorize?scope=users.profile%3Awrite&client_id=1014188996113.1014189480129&redirect_uri=https://ssrp.maxbridgland.com/callback_slack")
+                warning("You must login to your other workspace FIRST!")
+                getpass("Press ENTER to Continue")
+                webbrowser.open_new_tab("https://slack.com/oauth/authorize?scope=users:write&client_id=1014188996113.1014189480129")
                 prompt("Please Enter The Slack Auth Token Displayed on The Page When Done:")
                 slack_ans = input(tprompt)
                 info("You Input: " + slack_ans)
