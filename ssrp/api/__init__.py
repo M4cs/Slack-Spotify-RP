@@ -43,28 +43,31 @@ class API:
             url = "https://api.spotify.com/v1/me/player/currently-playing"
             res = requests.get(url, headers=headers)
             if res.status_code != 200:
-                return (None, None, None)
+                return (None, None, None, False)
             album_name = None
             artist = None
             name = None
             resobj = res.json()
             if resobj.get('item'):
+                playing = False
+                if resobj.get('is_playing'):
+                    playing = resobj.get('is_playing')
                 if resobj['item'].get('album'):
                     album_name = resobj['item']['album']['name']
                 if resobj['item'].get('artists'):
                     artist = resobj['item']['artists'][0]['name']
                 if resobj['item'].get('name'):
                     name = resobj['item']['name']
-                return (name, artist, album_name)
+                return (name, artist, album_name, playing)
             else:
-                return (None, None, None)
+                return (None, None, None, False)
         else:
-            return (None, None, None)
+            return (None, None, None, False)
             
     def set_now_playing(self):
-        song, artist, album = self.get_current_playing_song()
+        song, artist, album, playing = self.get_current_playing_song()
         for workspace in self.slack_workspace_tokens:
-            if not song or not artist or not album:
+            if not playing:
                 show_music("Not Playing Anything")
                 requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
                     "profile": {
@@ -97,14 +100,15 @@ class API:
     def refresh_access_token(self):
         res = requests.get("https://ssrp.maxbridgland.com/getRefreshForSpotify/" + self.refresh_token)
         if res.status_code == 200:
-            if res.get("access_token"):
-                self.current_spotify_token = res['access_token']
-                with open(self.config_file, "r+") as jf:
+            resobj = res.json()
+            if resobj.get("access_token"):
+                self.current_spotify_token = resobj['access_token']
+                with open(self.config_file, "w+") as jf:
                     confObj = json.load(jf)
-                    confObj['spotify_auth_token'] = res['access_token']
-                    if res.get('refresh_token'):
-                        self.refresh_token = res['refresh_token']
-                        confObj['spotify_refresh_token'] = res['refresh_token']
+                    confObj['spotify_auth_token'] = resobj['access_token']
+                    if resobj.get('refresh_token'):
+                        self.refresh_token = resobj['refresh_token']
+                        confObj['spotify_refresh_token'] = resobj['refresh_token']
                     json.dump(confObj, jf, indent=4)
             else:
                 error("Couldn't re-authenticate with Spotify! Please delete your config and go through setup again!")
