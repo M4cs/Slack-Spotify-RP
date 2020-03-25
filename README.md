@@ -9,6 +9,8 @@
 
 Slack-Spotify-RP (SSRP) is a tool that brings the functionality of Spotify Rich Presence to Slack! Now you can display and share what you're listening to with friends in under 3 minutes! It's extremely simple to setup with an easy to use authorization panel and a simple configuration! SSRP is still new and can always be improved upon! If you have any suggestions for features or issues please open up a new GitHub Issue!
 
+**SSRP Authentication Server Source Code (Not Well Documented Just For Your Mindsake): https://github.com/M4cs/Slack-Spotify-Authentication**
+
 ## Getting Started
 
 **SSRP is written in Python and requires Python 3.6 or above.**
