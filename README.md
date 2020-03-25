@@ -1,6 +1,10 @@
 # Slack-Spotify Rich Presence
 ### Lightweight, Fast, and Open Source Rich Presence Program for Spotify and Slack!
 
+<p>
+    <p align="center"><center><img src="https://raw.githubusercontent.com/M4cs/Slack-Spotify-RP/master/images/example.gif"></center></p>
+<p>
+
 ## Overview
 
 Slack-Spotify-RP (SSRP) is a tool that brings the functionality of Spotify Rich Presence to Slack! Now you can display and share what you're listening to with friends in under 3 minutes! It's extremely simple to setup with an easy to use authorization panel and a simple configuration! SSRP is still new and can always be improved upon! If you have any suggestions for features or issues please open up a new GitHub Issue!
