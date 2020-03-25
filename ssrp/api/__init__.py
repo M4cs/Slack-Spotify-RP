@@ -42,7 +42,6 @@ class API:
             url = "https://api.spotify.com/v1/me/player/currently-playing"
             res = requests.get(url, headers=headers)
             if res.status_code != 200:
-                print("we broken somehow!")
                 return (None, None, None)
             album_name = None
             artist = None
@@ -65,6 +64,7 @@ class API:
         for workspace in self.slack_workspace_tokens:
             song, artist, album = self.get_current_playing_song()
             if not song or not artist or not album:
+                show_music("Not Playing Anything")
                 requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
                     "profile": {
                     "status_text": "",
