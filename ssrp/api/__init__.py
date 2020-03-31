@@ -13,6 +13,8 @@ class API:
         self.slack_workspace_tokens = self.config['slack_workspaces']
         self.update_interval = self.config['update_interval']
         self.format = self.config['format']
+        self.current_song = "Not Playing Anything"
+        self.refresh_access_token()
         
     def parse_config(self):
         with open(self.config_file, 'r+') as jc:
@@ -68,22 +70,27 @@ class API:
         song, artist, album, playing = self.get_current_playing_song()
         for workspace in self.slack_workspace_tokens:
             if not playing:
-                show_music("Not Playing Anything")
-                requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
-                    "profile": {
-                    "status_text": "Spotify: Not Playing Anything",
-                    "status_emoji": ":musical_note:",
-                    "status_expiration": 0
-                }}), headers={"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + workspace})
+                if self.current_song == "Not Playing Anything":
+                    pass
+                else:
+                    show_music("Not Playing Anything")
+                    requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
+                        "profile": {
+                        "status_text": "Spotify: Not Playing Anything",
+                        "status_emoji": ":musical_note:",
+                        "status_expiration": 0
+                    }}), headers={"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + workspace})
             else:
                 status = self.format.replace("artist", artist).replace("song", song).replace("album", album)
-                show_music("Now Playing: " + status)
-                requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
-                    "profile": {
-                    "status_text": "Spotify: " + status,
-                    "status_emoji": ":musical_note:",
-                    "status_expiration": 30
-                }}), headers={"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + workspace})
+                if self.current_song != status:
+                    self.current_song = status
+                    show_music("Now Playing: " + status)
+                    requests.post("https://slack.com/api/users.profile.set", data=json.dumps({
+                        "profile": {
+                        "status_text": "Spotify: " + status,
+                        "status_emoji": ":musical_note:",
+                        "status_expiration": 30
+                    }}), headers={"Content-Type": "application/json; charset=utf-8", "Authorization": "Bearer " + workspace})
             time.sleep(2)
     
             
@@ -103,13 +110,15 @@ class API:
             resobj = res.json()
             if resobj.get("access_token"):
                 self.current_spotify_token = resobj['access_token']
-                with open(self.config_file, "w+") as jf:
+                with open(self.config_file, "r+") as jf:
                     confObj = json.load(jf)
                     confObj['spotify_auth_token'] = resobj['access_token']
                     if resobj.get('refresh_token'):
                         self.refresh_token = resobj['refresh_token']
                         confObj['spotify_refresh_token'] = resobj['refresh_token']
+                    jf.seek(0)
                     json.dump(confObj, jf, indent=4)
+                    jf.truncate()
             else:
                 error("Couldn't re-authenticate with Spotify! Please delete your config and go through setup again!")
                 exit()

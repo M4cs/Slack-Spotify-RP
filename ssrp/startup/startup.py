@@ -8,7 +8,9 @@ DEFAULT_CONFIG = {
     "spotify_refresh_token": "NONE",
     "slack_workspaces": [],
     "update_interval": 5,
-    "format": "song - artist | [album]"
+    "format": "song - artist | [album]",
+    "version": "1.0.1",
+    "auto_update": True
 }
 CONFIG_DIR = os.path.realpath(os.path.expanduser("~") + "/.ssrp/")
 CONFIG_FILE = os.path.realpath(os.path.expanduser("~") + "/.ssrp/config.json")
